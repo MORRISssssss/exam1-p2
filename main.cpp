@@ -4,16 +4,17 @@ PwmOut pwm(D6);
 AnalogIn ain(A0);
 
 Thread t;
-Thread queueThread;
-EventQueue queue(32 * EVENTS_EVENT_SIZE);
 
 void ADC()
 {
     float v;
+    float sample[1000];
     for (int i = 0; i < 1000; i++){
-        v = ain.read();
-        queue.call(printf, "%f\n", v);
+        sample[i] = ain.read();
         ThisThread::sleep_for(1ms);
+    }
+    for (int i = 0; i < 1000; i++){
+        printf("%d: %f\n", i, sample[i]);
     }
     while (true){
         ;
@@ -24,7 +25,6 @@ void ADC()
 int main()
 {
     t.start(ADC);
-    queueThread.start(callback(&queue, &EventQueue::dispatch_forever));
     pwm.period_us(50);
     while (true) {
         for (int i = 0; i < 9; i++){
