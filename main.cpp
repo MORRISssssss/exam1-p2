@@ -1,14 +1,27 @@
 #include "mbed.h"
 
 PwmOut pwm(D6);
+AnalogIn ain(A0);
+
+Thread t;
+Thread queueThread;
+EventQueue queue(32 * EVENTS_EVENT_SIZE);
+
+void ADC()
+{
+    float v;
+    while (true){
+        v = ain.read();
+        queue.call(printf, "%f\n", v);
+        ThisThread::sleep_for(1ms);
+    }
+}
 
 // main() runs in its own thread in the OS
 int main()
 {
-    float sample[10];
-    sample[0] = 0.1;
-    
-    int cnt = 0;
+    t.start(ADC);
+    queueThread.start(callback(&queue, &EventQueue::dispatch_forever));
     pwm.period_us(50);
     while (true) {
         for (int i = 0; i < 9; i++){
