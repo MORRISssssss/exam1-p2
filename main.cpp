@@ -10,10 +10,13 @@ EventQueue queue(32 * EVENTS_EVENT_SIZE);
 void ADC()
 {
     float v;
-    while (true){
+    for (int i = 0; i < 1000; i++){
         v = ain.read();
         queue.call(printf, "%f\n", v);
         ThisThread::sleep_for(1ms);
+    }
+    while (true){
+        ;
     }
 }
 
